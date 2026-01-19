@@ -48,7 +48,7 @@ print("Running. Press 'q' to quit.")
 
 #vision loop
 def vision_loop():
-
+    global latest_T_base_O
     pipeline = rs.pipeline()
     config = rs.config()
     config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
