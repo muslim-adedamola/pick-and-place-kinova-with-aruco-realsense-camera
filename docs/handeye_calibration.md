@@ -37,6 +37,7 @@ Rather than duplicating that content here, this document summarizes how the work
    - Camera intrinsics for the Intel RealSense were estimated (or obtained from
      prior calibration).
    - These intrinsics are required for accurate pose estimation.
+   - The camera intrinsics and distortion coefficients are hardcoded in `src/vision_aruco.py`
    - For users unfamiliar with camera intrinsic calibration, the following
    references provide clear, step-by-step guidance using MATLAB tools:
    https://www.mathworks.com/help/vision/ug/using-the-single-camera-calibrator-app.html or https://www.youtube.com/watch?v=SoULhS9Ccgo
