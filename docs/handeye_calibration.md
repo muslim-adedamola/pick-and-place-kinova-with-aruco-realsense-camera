@@ -81,3 +81,12 @@ This transform is hardcoded in `src/vision_aruco.py` and used to convert the det
 ## Notes
 - Calibration is hardware-specific
 - Must be redone if camera mounting changes or camera is replaced or robot base frame defintion changes
+- To extend the system from **pick-only** to **pick-and-place**, an additional
+  ArUco marker can be placed at the desired placement location. The pose of this
+  marker can be detected in the camera frame, transformed into the robot base
+  frame using
+
+  `T_base_P = T_base_C @ T_cam_P`
+
+  and then executed as a Cartesian target using the existing motion interface
+  (`src/move_cartesian.py`).
