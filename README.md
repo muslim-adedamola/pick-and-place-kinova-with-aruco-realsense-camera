@@ -71,7 +71,6 @@ The Kinova Kortex API (python) and Intel RealSense SDK must be installed separat
 ```bash  
 python src/pick.py --ip <ROBOT_IP> --username admin --password admin  
 ```
-
 **Controls**
 
 * **SPACE** — latch the currently detected object pose and execute pick  
@@ -86,7 +85,7 @@ This implementation assumes:
 * Camera intrinsics are known  
 * Hand–eye calibration (camera to robot base transform) is precomputed
 
-These values are hardware-specific and must be recalibrated if the setup changes. Click here for calibration procedure
+These values are hardware-specific and must be recalibrated if the setup changes. [Click here for the calibration procedure](docs/handeye_calibration.md)
 
 ---
 
