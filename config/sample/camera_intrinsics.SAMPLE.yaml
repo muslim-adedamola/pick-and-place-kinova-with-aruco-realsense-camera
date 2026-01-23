@@ -1,0 +1,13 @@
+camera:
+  width: 1280
+  height: 720
+  fps: 30
+
+intrinsics:
+  fx: 889.2416
+  fy: 888.8014
+  cx: 625.8390
+  cy: 376.3067
+
+distortion:
+  coeffs: [0.1836, -0.3504, 0.0, 0.0, 0.0]

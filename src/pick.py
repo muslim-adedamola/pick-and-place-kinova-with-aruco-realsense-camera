@@ -6,11 +6,18 @@ from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from move_cartesian import move_to_cartesian_pose
 from grasp_utils import compute_approach_and_grasp
 from gripper_control import open_gripper, close_gripper
+from config_loader import load_configs
+
 import time
 
+cfg = load_configs()
+approach_offset = float(cfg["task"]["grasp"]["approach_offset_m"])
+grasp_offset = float(cfg["task"]["grasp"]["grasp_offset_m"])
+lift_offset = float(cfg["task"]["grasp"]["lift_offset_m"])
 
 
 def main():
+
     args = utilities.parseConnectionArguments()
 
     with utilities.DeviceConnection.createTcpConnection(args) as router:
@@ -35,7 +42,8 @@ def main():
                 vision_aruco.pose_ready_event.clear()
 
                 # Compute grasp frames
-                T_base_A, _, T_base_L = compute_approach_and_grasp(T_base_O, approach_offset=0.10, grasp_offset=0.03, lift_offset=0.20)
+                T_base_A, _, T_base_L = compute_approach_and_grasp(T_base_O, approach_offset=approach_offset, 
+                                                                   grasp_offset=grasp_offset, lift_offset=lift_offset)
 
                 open_gripper(base)
                 time.sleep(0.5)

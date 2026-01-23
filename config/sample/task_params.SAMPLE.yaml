@@ -1,0 +1,10 @@
+aruco:
+  dictionary: "DICT_4X4_50"
+  marker_length_m: 0.04
+  target_id: null   # set to an int if you want a specific marker
+
+grasp:
+  approach_offset_m: 0.10
+  grasp_offset_m: 0.03
+  lift_offset_m: 0.20
+
