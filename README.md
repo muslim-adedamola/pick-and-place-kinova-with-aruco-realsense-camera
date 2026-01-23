@@ -7,7 +7,7 @@
 </p>
 
 
-This repository contains a real-world pick-and-place project implemented on a Kinova Gen3 robotic arm, using an Intel RealSense RGB-D camera and an ArUco marker for object pose estimation.
+This repository is intended for educational and demonstration purposes. It contains a real-world pick-and-place project implemented on a Kinova Gen3 robotic arm, using an Intel RealSense RGB-D camera and an ArUco marker for object pose estimation.
 
 It demonstrates a minimal but complete vision-to-manipulation pipeline in camera perception → pose estimation → frame transformation → Cartesian motion → gripper execution.
 

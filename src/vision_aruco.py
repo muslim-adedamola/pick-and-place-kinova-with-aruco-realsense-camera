@@ -2,57 +2,60 @@ import numpy as np
 import cv2
 import pyrealsense2 as rs
 import threading
+from config_loader import load_configs
 
+
+cfg = load_configs()
 latest_T_base_O = None
 pose_ready_event = threading.Event()
 stop_event = threading.Event() 
 
 
 # load hand-eye transform ( ^B T_C )
-T_base_C = np.array([
-                [0.0566, 0.6264,  -0.7775,  1.5330],
-                [0.9963, -0.0858,  0.0034,  0.1072],
-                [-0.0645,  -0.7748, -0.6289,  0.9694],
-                [0,  0,  0,  1]])
-
+# hand-eye: T_base_cam
+T_base_C = np.array(cfg["handeye"]["T_base_cam"]["matrix"], dtype=float)
 
 # ArUco setup
-aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+dict_name = cfg["task"]["aruco"].get("dictionary", "DICT_4X4_50")
+aruco_dict = cv2.aruco.getPredefinedDictionary(getattr(cv2.aruco, dict_name))
 aruco_params = cv2.aruco.DetectorParameters()
 detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
+target_id = cfg["task"]["aruco"].get("target_id", None)
 
-marker_length = 0.04  
+marker_length = float(cfg["task"]["aruco"]["marker_length_m"])
 
-# Camera intrinsics
-fx = 889.2416
-fy = 888.8014
-ppx = 625.8390
-ppy = 376.3067
+# camera intrinsics
+Kcfg = cfg["camera"]["intrinsics"]
+fx = float(Kcfg["fx"])
+fy = float(Kcfg["fy"])
+cx = float(Kcfg["cx"])
+cy = float(Kcfg["cy"])
 
-camera_matrix = np.array([
-    [fx, 0, ppx],
-    [0, fy, ppy],
-    [0,    0,      1    ]
-], dtype=np.float32)
+#camera matrix
+camera_matrix = np.array(
+    [[fx, 0.0, cx],
+     [0.0, fy, cy],
+     [0.0, 0.0, 1.0]],
+    dtype=np.float32
+)
 
-dist_coeffs = np.array([
-    0.1836,   # k1
-    -0.3504,   # k2
-    0.0,      # p1
-    0.0,      # p2
-    0.0       # k3
-], dtype=np.float64)
+#distortion coefficients is in the form [k1, k2, p1, p2, k3] in cam_intrinsics yaml file
+dist_coeffs = np.array(cfg["camera"]["distortion"]["coeffs"], dtype=np.float64)
 
 print("Running. Press 'q' to quit.")
 
+
+W = int(cfg["camera"]["camera"]["width"])
+H = int(cfg["camera"]["camera"]["height"])
+FPS = int(cfg["camera"]["camera"]["fps"])
 
 #vision loop
 def vision_loop():
     global latest_T_base_O
     pipeline = rs.pipeline()
     config = rs.config()
-    config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-    config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+    config.enable_stream(rs.stream.color, W, H, rs.format.bgr8, FPS)
+    config.enable_stream(rs.stream.depth, W, H, rs.format.z16, FPS)
 
     pipeline.start(config)
 
@@ -73,12 +76,19 @@ def vision_loop():
             corners, ids, _ = detector.detectMarkers(gray)
 
             if ids is not None:
+                ids_flat = ids.flatten().tolist()
+
+                if target_id is not None and int(target_id) in ids_flat:
+                    idx = ids_flat.index(int(target_id))
+                else:
+                    idx = 0
+
                 rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
                     corners, marker_length, camera_matrix, dist_coeffs
                 )
 
-                rvec = rvecs[0]
-                tvec = tvecs[0]
+                rvec = rvecs[idx]
+                tvec = tvecs[idx]
 
                 R_cam_O, _ = cv2.Rodrigues(rvec)
 
